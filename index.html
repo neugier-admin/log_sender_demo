@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wazuh Log Sender Console</title>
+    <style>
+        /* --- EMBEDDED TAILWIND CSS & CUSTOM STYLES --- */
+        
+        /* Basic Reset */
+        *, ::before, ::after {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb; /* Default border color */
+        }
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        body {
+            margin: 0;
+            line-height: inherit;
+        }
+
+        /* Custom Styles */
+        .log-card {
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .log-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2d3748; }
+        ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #718096; }
+        .tab-button { 
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+        }
+
+        /* Generated Tailwind Classes */
+        .bg-black { background-color: #000; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-cyan-600 { background-color: #0891b2; }
+        .bg-gray-600 { background-color: #4b5563; }
+        .bg-gray-700 { background-color: #374151; }
+        .bg-gray-800 { background-color: #1f2937; }
+        .bg-gray-900 { background-color: #111827; }
+        .bg-purple-600 { background-color: #9333ea; }
+        .border { border-width: 1px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-b-2 { border-bottom-width: 2px; }
+        .border-l-4 { border-left-width: 4px; }
+        .border-cyan-400 { border-color: #22d3ee; }
+        .border-cyan-500 { border-color: #06b6d4; }
+        .border-gray-600 { border-color: #4b5563; }
+        .border-gray-700 { border-color: #374151; }
+        .border-transparent { border-color: transparent; }
+        .block { display: block; }
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .hidden { display: none; }
+        .flex-col { flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
+        .items-center { align-items: center; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .font-semibold { font-weight: 600; }
+        .h-24 { height: 6rem; }
+        .h-48 { height: 12rem; }
+        .min-h-screen { min-height: 100vh; }
+        .max-w-4xl { max-width: 56rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .overflow-y-auto { overflow-y: auto; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .pl-3 { padding-left: 0.75rem; }
+        .pt-4 { padding-top: 1rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-md { border-radius: 0.375rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+        .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-cyan-300 { color: #67e8f9; }
+        .text-cyan-400 { color: #22d3ee; }
+        .text-gray-200 { color: #e5e7eb; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-green-400 { color: #4ade80; }
+        .text-purple-400 { color: #c084fc; }
+        .text-red-400 { color: #f87171; }
+        .text-white { color: #fff; }
+        .text-yellow-400 { color: #facc15; }
+        .w-full { width: 100%; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+        .hover\:bg-cyan-700:hover { background-color: #0e7490; }
+        .hover\:bg-gray-700:hover { background-color: #374151; }
+        .hover\:bg-purple-700:hover { background-color: #7e22ce; }
+        .hover\:text-gray-300:hover { color: #d1d5db; }
+        .hover\:text-white:hover { color: #fff; }
+        .focus\:border-cyan-500:focus { border-color: #06b6d4; }
+        .focus\:ring-2:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000); }
+        .focus\:ring-cyan-500:focus { --tw-ring-color: #06b6d4; }
+        .col-span-1 { grid-column: span 1 / span 1; }
+
+        @media (min-width: 768px) {
+            .md\:flex-row { flex-direction: row; }
+            .md\:p-8 { padding: 2rem; }
+            .md\:space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
+            .md\:space-y-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+        }
+
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse {
+            50% { opacity: .5; }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex flex-col items-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8 space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-cyan-400">Wazuh Log Sender Console</h1>
+            <p class="text-gray-400 mt-2">For sending log samples to Wazuh Manager for demo purposes.</p>
+        </div>
+
+        <!-- Wazuh Server Configuration -->
+        <div class="bg-gray-900 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3 text-gray-300 border-l-4 border-cyan-400 pl-3">Wazuh Manager Settings</h2>
+            <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
+                <div class="w-full">
+                    <label for="wazuh-url" class="block text-sm font-medium text-gray-400 mb-1">Wazuh HTTP/HTTPS Listener URL</label>
+                    <input type="text" id="wazuh-url" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" placeholder="e.g., https://192.168.1.100:514" value="https://localhost:514">
+                </div>
+            </div>
+             <p class="text-xs text-gray-500 mt-3">
+                <strong>Important:</strong> You need to configure the `http` connection type in your Wazuh Manager's `ossec.conf`. For HTTPS, you must also configure SSL certificates on the manager. Port 514 is the standard for syslog, but ensure your listener is configured for HTTP/S on this port. Browsers may block requests (CORS policy). For demo purposes, use a browser extension (like CORS Unblock) to bypass this.
+            </p>
+        </div>
+
+        <!-- Status Console (Moved) -->
+        <div>
+            <h2 class="text-xl font-semibold mb-3 text-gray-300 border-l-4 border-cyan-400 pl-3">Status Output</h2>
+            <div id="status-console" class="w-full h-48 bg-black rounded-lg p-4 font-mono text-sm overflow-y-auto text-gray-300">
+                <p class="text-gray-500">> Waiting to send logs...</p>
+            </div>
+             <button onclick="clearConsole()" class="mt-3 text-xs bg-gray-700 hover:bg-gray-600 text-gray-400 py-1 px-3 rounded-md">
+                Clear Output
+            </button>
+        </div>
+        
+        <!-- Tabbed Interface for Logs and Scenarios -->
+        <div>
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-700">
+                <button id="tab-single" onclick="switchTab('single')" class="tab-button py-2 px-6 font-semibold text-white border-b-2 border-cyan-400">Single Log Samples</button>
+                <button id="tab-scenarios" onclick="switchTab('scenarios')" class="tab-button py-2 px-6 font-semibold text-gray-500 border-b-2 border-transparent hover:text-white">Alert Scenarios</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="pt-4">
+                <!-- Single Log Samples Content -->
+                <div id="content-single">
+                    <div class="grid grid-cols-2 gap-4">
+                       <!-- Juniper Logs First -->
+                        <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-green-400">Juniper - Login Success</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a successful login for the 'root' user.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_LOGIN_EVENT: User 'root' login, class 'super-user' fpc0[17484], ssh-connection '', client-mode 'junoscript'`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_LOGIN_EVENT: User 'root' login, class 'super-user' fpc0[17484], ssh-connection '', client-mode 'junoscript'`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                         <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-red-400">Juniper - Login Failure</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a failed login for 'vodatel' user.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Jan 21 04:52:23 Juniper-QA-SW sshd: SSHD_LOGIN_FAILED: Login failed for user 'vodatel' from host '10.255.1.76'`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Jan 21 04:52:23 Juniper-QA-SW sshd: SSHD_LOGIN_FAILED: Login failed for user 'vodatel' from host '10.255.1.76'`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                        <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">Juniper - Auth Event</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a user authentication event.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_AUTH_EVENT: Authenticated user 'root' at permission level 'super-user'`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_AUTH_EVENT: Authenticated user 'root' at permission level 'super-user'`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                        <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">Juniper - Config Mode</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a user entering configuration mode.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Jan 21 04:51:42 Juniper-QA-SW mgd[14386]: UI_DBBASE_LOGIN_EVENT: User 'root' entering configuration mode`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Jan 21 04:51:42 Juniper-QA-SW mgd[14386]: UI_DBBASE_LOGIN_EVENT: User 'root' entering configuration mode`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                        <!-- H3C Logs Second -->
+                         <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-green-400">H3C - Login Success</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a successful login for 'ccnetwork'.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:37:59 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ccnetwork logged in from 10.255.1.70.`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:37:59 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ccnetwork logged in from 10.255.1.70.`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                         <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-red-400">H3C - Authentication Failure</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a password failure for 'ccnetwork'.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:40:45 2025 H3C syslog test SW %10SSHS/6/SSHS_AUTH_PWD_FAIL: Authentication failed for user ccnetwork from 10.255.1.70 port 52353 because of invalid username or wrong password.`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:40:45 2025 H3C syslog test SW %10SSHS/6/SSHS_AUTH_PWD_FAIL: Authentication failed for user ccnetwork from 10.255.1.70 port 52353 because of invalid username or wrong password.`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                        <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">H3C - Auth Success</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a successful password authentication.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:37:57 2025 H3C syslog test SW %10SSHS/6/SSHS_AUTH_SUCCESS: SSH user ccnetwork from 10.255.1.70 port 52353 passed password authentication.`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:37:57 2025 H3C syslog test SW %10SSHS/6/SSHS_AUTH_SUCCESS: SSH user ccnetwork from 10.255.1.70 port 52353 passed password authentication.`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                        <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                            <div class="flex-grow">
+                                <p class="font-bold text-white">H3C - Connect Success</p>
+                                <p class="text-sm text-gray-400 mt-1">Simulates a successful SSH connection.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 mt-3">
+                                <button onclick="sendLog(this, `Oct 17 15:37:58 2025 H3C syslog test SW %10SSHS/6/SSHS_CONNECT: SSH user ccnetwork (IP: 10.255.1.70) connected to the server successfully.`)" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-sm py-1 px-3 rounded transition">Send</button>
+                                <button onclick="loadToCustom(`Oct 17 15:37:58 2025 H3C syslog test SW %10SSHS/6/SSHS_CONNECT: SSH user ccnetwork (IP: 10.255.1.70) connected to the server successfully.`)" class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white text-sm py-1 px-3 rounded transition">Load to Custom</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Alert Scenarios Content -->
+                <div id="content-scenarios" class="hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-300 mb-3">Juniper Scenarios</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                    <div class="flex-grow">
+                                        <p class="font-bold text-purple-400">Brute Force Attack</p>
+                                        <p class="text-sm text-gray-400 mt-1">Sends 3 failed Juniper login logs in quick succession.</p>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button onclick="sendJuniperBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                    </div>
+                                </div>
+                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                    <div class="flex-grow">
+                                        <p class="font-bold text-purple-400">Multi-Source Logins</p>
+                                        <p class="text-sm text-gray-400 mt-1">Sends Juniper login logs from 3 different source IPs.</p>
+                                        <div class="space-y-2 mt-3">
+                                            <div>
+                                                <label for="juniper-ip-1" class="text-xs text-gray-400">Source IP 1</label>
+                                                <input type="text" id="juniper-ip-1" value="10.255.1.76" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                            <div>
+                                                <label for="juniper-ip-2" class="text-xs text-gray-400">Source IP 2</label>
+                                                <input type="text" id="juniper-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                            <div>
+                                                <label for="juniper-ip-3" class="text-xs text-gray-400">Source IP 3</label>
+                                                <input type="text" id="juniper-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button onclick="sendJuniperMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                           <h3 class="text-lg font-semibold text-gray-300 mb-3">H3C Scenarios</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                    <div class="flex-grow">
+                                        <p class="font-bold text-purple-400">Brute Force Attack</p>
+                                        <p class="text-sm text-gray-400 mt-1">Sends 3 failed H3C login logs in quick succession.</p>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button onclick="sendH3cBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                    </div>
+                                </div>
+                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                    <div class="flex-grow">
+                                        <p class="font-bold text-purple-400">Multi-Source Logins</p>
+                                        <p class="text-sm text-gray-400 mt-1">Sends H3C login logs from 3 different source IPs.</p>
+                                         <div class="space-y-2 mt-3">
+                                            <div>
+                                                <label for="h3c-ip-1" class="text-xs text-gray-400">Source IP 1</label>
+                                                <input type="text" id="h3c-ip-1" value="10.255.1.70" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                            <div>
+                                                <label for="h3c-ip-2" class="text-xs text-gray-400">Source IP 2</label>
+                                                <input type="text" id="h3c-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                            <div>
+                                                <label for="h3c-ip-3" class="text-xs text-gray-400">Source IP 3</label>
+                                                <input type="text" id="h3c-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button onclick="sendH3cMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Custom Log -->
+        <div>
+            <h2 class="text-xl font-semibold mb-3 text-gray-300 border-l-4 border-cyan-400 pl-3">Custom Log Content</h2>
+            <textarea id="custom-log" class="w-full h-24 bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition" placeholder="Enter any log you want to send here, or load a default log to edit..."></textarea>
+            <button onclick="sendLog(this, document.getElementById('custom-log').value)" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition">
+                Send Custom Log
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const wazuhUrlInput = document.getElementById('wazuh-url');
+        const customLogTextarea = document.getElementById('custom-log');
+        const statusConsole = document.getElementById('status-console');
+
+        function switchTab(tabName) {
+            const singleTab = document.getElementById('tab-single');
+            const scenariosTab = document.getElementById('tab-scenarios');
+            const singleContent = document.getElementById('content-single');
+            const scenariosContent = document.getElementById('content-scenarios');
+
+            if (tabName === 'single') {
+                // Style tabs
+                singleTab.classList.add('text-white', 'border-cyan-400');
+                singleTab.classList.remove('text-gray-500', 'border-transparent');
+                scenariosTab.classList.add('text-gray-500', 'border-transparent');
+                scenariosTab.classList.remove('text-white', 'border-cyan-400');
+
+                // Show/hide content
+                singleContent.classList.remove('hidden');
+                scenariosContent.classList.add('hidden');
+            } else { // 'scenarios'
+                // Style tabs
+                scenariosTab.classList.add('text-white', 'border-cyan-400');
+                scenariosTab.classList.remove('text-gray-500', 'border-transparent');
+                singleTab.classList.add('text-gray-500', 'border-transparent');
+                singleTab.classList.remove('text-white', 'border-cyan-400');
+                
+                // Show/hide content
+                scenariosContent.classList.remove('hidden');
+                singleContent.classList.add('hidden');
+            }
+        }
+
+        // Function to add a message to the status console
+        function logToConsole(message, type = 'info') {
+            const now = new Date().toLocaleTimeString();
+            const p = document.createElement('p');
+            
+            let typeColor = 'text-gray-300';
+            let typePrefix = 'INFO';
+            if (type === 'success') {
+                typeColor = 'text-green-400';
+                typePrefix = 'SUCCESS';
+            } else if (type === 'error') {
+                typeColor = 'text-red-400';
+                typePrefix = 'ERROR';
+            } else if (type === 'sending') {
+                typeColor = 'text-yellow-400';
+                typePrefix = 'SENDING';
+            }
+            
+            p.innerHTML = `<span class="text-gray-500">${now}</span> <span class="${typeColor} font-bold">[${typePrefix}]</span>: ${message}`;
+            statusConsole.appendChild(p);
+            statusConsole.scrollTop = statusConsole.scrollHeight; // Auto-scroll to bottom
+        }
+
+        // Function to clear console
+        function clearConsole() {
+            statusConsole.innerHTML = '<p class="text-gray-500">> Output cleared.</p>';
+        }
+
+        // Function to load a log message into the custom textarea for editing
+        function loadToCustom(logMessage) {
+            customLogTextarea.value = logMessage;
+            logToConsole('Log loaded into custom field for editing.', 'info');
+            customLogTextarea.focus(); // Focus on the textarea for immediate editing
+        }
+
+        // --- TIMESTAMP FUNCTIONS ---
+
+        function getCurrentTimestamp(withYear = false) {
+            const now = new Date();
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = months[now.getMonth()];
+            // Syslog format uses a space for padding single-digit days, e.g., "Oct  7"
+            const day = String(now.getDate()).padStart(2, ' ');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timePart = `${month} ${day} ${hours}:${minutes}:${seconds}`;
+
+            if (withYear) {
+                const year = now.getFullYear();
+                return `${timePart} ${year}`;
+            }
+            return timePart;
+        }
+
+        function updateLogTimestamp(logMessage) {
+            // Regex for "Mmm dd hh:mm:ss yyyy"
+            const h3cRegex = /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}\s+\d{4}/;
+            // Regex for "Mmm dd hh:mm:ss" at the start of the string
+            const juniperRegex = /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}/;
+
+            if (h3cRegex.test(logMessage)) {
+                return logMessage.replace(h3cRegex, getCurrentTimestamp(true));
+            } else if (juniperRegex.test(logMessage)) {
+                return logMessage.replace(juniperRegex, getCurrentTimestamp(false));
+            }
+            
+            return logMessage; // Return original if no timestamp is matched
+        }
+
+
+        // --- SENDING LOGIC ---
+
+        async function performFetch(logMessage) {
+            const url = wazuhUrlInput.value;
+            if (!url) {
+                logToConsole('Wazuh Manager URL is not set!', 'error');
+                return false;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: logMessage
+                });
+                if (response.ok) {
+                    return true;
+                } else {
+                    logToConsole(`Send failed. Server response: ${response.status} ${response.statusText}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                logToConsole(`Request failed: ${error.message}`, 'error');
+                logToConsole(`This is likely a CORS error. Check browser console for details.`, 'error');
+                return false;
+            }
+        }
+
+        async function sendLog(button, logMessage) {
+             if (!logMessage && button.id !== 'custom-log-btn') {
+                console.error("Log message is empty or null for a default log button.");
+                return;
+            }
+            // For custom log button, get the value from the textarea
+            if (!logMessage && button.onclick.toString().includes("custom-log")) {
+                 logMessage = customLogTextarea.value;
+            }
+             if (!logMessage) {
+                logToConsole('Custom log content cannot be empty!', 'error');
+                return;
+            }
+
+
+            const updatedLog = updateLogTimestamp(logMessage);
+
+            logToConsole(`Preparing to send...`, 'sending');
+            logToConsole(`Log content: <span class="text-cyan-300">${updatedLog}</span>`);
+
+            let originalText = '';
+            if (button) {
+                button.disabled = true;
+                button.classList.add('animate-pulse');
+                originalText = button.innerText;
+                button.innerText = 'Sending...';
+            }
+
+            const success = await performFetch(updatedLog);
+            if (success) {
+                logToConsole(`Log sent successfully!`, 'success');
+            }
+
+            if (button) {
+                button.disabled = false;
+                button.classList.remove('animate-pulse');
+                button.innerText = originalText;
+            }
+        }
+        
+        // --- SCENARIO FUNCTIONS ---
+
+        async function sendJuniperBruteForce(button) {
+            logToConsole('Starting Juniper Brute Force scenario...', 'sending');
+            const logTemplate = `Jan 21 04:52:23 Juniper-QA-SW sshd: SSHD_LOGIN_FAILED: Login failed for user 'vodatel' from host '10.255.1.76'`;
+            
+            button.disabled = true;
+            const originalText = button.innerText;
+            button.innerText = 'Running...';
+
+            for (let i = 0; i < 3; i++) {
+                const updatedLog = updateLogTimestamp(logTemplate);
+                logToConsole(`Sending failure attempt #${i + 1}...`, 'info');
+                logToConsole(`Log content: <span class="text-cyan-300">${updatedLog}</span>`);
+                const success = await performFetch(updatedLog);
+                if (!success) {
+                    logToConsole('Scenario stopped due to a send error.', 'error');
+                    break; 
+                }
+                if (i < 2) {
+                     await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            logToConsole('Juniper Brute Force scenario complete.', 'success');
+            button.disabled = false;
+            button.innerText = originalText;
+        }
+
+        async function sendH3cBruteForce(button) {
+            logToConsole('Starting H3C Brute Force scenario...', 'sending');
+            const logTemplate = `Oct 17 15:40:45 2025 H3C syslog test SW %10SSHS/6/SSHS_AUTH_PWD_FAIL: Authentication failed for user ccnetwork from 10.255.1.70 port 52353 because of invalid username or wrong password.`;
+            
+            button.disabled = true;
+            const originalText = button.innerText;
+            button.innerText = 'Running...';
+
+            for (let i = 0; i < 3; i++) {
+                const updatedLog = updateLogTimestamp(logTemplate);
+                logToConsole(`Sending failure attempt #${i + 1}...`, 'info');
+                logToConsole(`Log content: <span class="text-cyan-300">${updatedLog}</span>`);
+                const success = await performFetch(updatedLog);
+                if (!success) {
+                    logToConsole('Scenario stopped due to a send error.', 'error');
+                    break; 
+                }
+                if (i < 2) {
+                     await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            logToConsole('H3C Brute Force scenario complete.', 'success');
+            button.disabled = false;
+            button.innerText = originalText;
+        }
+        
+        async function sendJuniperMultiSource(button) {
+            logToConsole('Starting Juniper Multi-Source Login scenario...', 'sending');
+            const ip1 = document.getElementById('juniper-ip-1').value;
+            const ip2 = document.getElementById('juniper-ip-2').value;
+            const ip3 = document.getElementById('juniper-ip-3').value;
+
+            if (!ip1 || !ip2 || !ip3) {
+                logToConsole('All three source IPs must be provided for the Juniper scenario!', 'error');
+                return;
+            }
+
+            const logTemplates = [
+                `Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_LOGIN_EVENT: User 'root' login from host '${ip1}', class 'super-user'`,
+                `Oct 17 15:24:05 Juniper-QA-SW mgd[17491]: UI_LOGIN_EVENT: User 'admin' login from host '${ip2}', class 'super-user'`,
+                `Oct 17 15:24:12 Juniper-QA-SW mgd[17498]: UI_LOGIN_EVENT: User 'netops' login from host '${ip3}', class 'operator'`
+            ];
+
+            button.disabled = true;
+            const originalText = button.innerText;
+            button.innerText = 'Running...';
+
+            for (let i = 0; i < logTemplates.length; i++) {
+                const updatedLog = updateLogTimestamp(logTemplates[i]);
+                logToConsole(`Sending Juniper login from ${updatedLog.match(/host '([^']+)'/)[1]}...`, 'info');
+                logToConsole(`Log content: <span class="text-cyan-300">${updatedLog}</span>`);
+                const success = await performFetch(updatedLog);
+                if (!success) {
+                    logToConsole('Scenario stopped due to a send error.', 'error');
+                    break;
+                }
+                if (i < logTemplates.length - 1) {
+                     await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            logToConsole('Juniper Multi-Source Login scenario complete.', 'success');
+            button.disabled = false;
+            button.innerText = originalText;
+        }
+
+        async function sendH3cMultiSource(button) {
+            logToConsole('Starting H3C Multi-Source Login scenario...', 'sending');
+             const ip1 = document.getElementById('h3c-ip-1').value;
+            const ip2 = document.getElementById('h3c-ip-2').value;
+            const ip3 = document.getElementById('h3c-ip-3').value;
+
+            if (!ip1 || !ip2 || !ip3) {
+                logToConsole('All three source IPs must be provided for the H3C scenario!', 'error');
+                return;
+            }
+            
+            const logTemplates = [
+                `Oct 17 15:37:59 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ccnetwork logged in from ${ip1}.`,
+                `Oct 17 15:38:05 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: anotheruser logged in from ${ip2}.`,
+                `Oct 17 15:38:12 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: admin logged in from ${ip3}.`
+            ];
+
+            button.disabled = true;
+            const originalText = button.innerText;
+            button.innerText = 'Running...';
+
+            for (let i = 0; i < logTemplates.length; i++) {
+                const updatedLog = updateLogTimestamp(logTemplates[i]);
+                logToConsole(`Sending H3C login from ${updatedLog.match(/from ([\d\.]+)\./)[1]}...`, 'info');
+                logToConsole(`Log content: <span class="text-cyan-300">${updatedLog}</span>`);
+                const success = await performFetch(updatedLog);
+                if (!success) {
+                    logToConsole('Scenario stopped due to a send error.', 'error');
+                    break;
+                }
+                if (i < logTemplates.length - 1) {
+                     await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            logToConsole('H3C Multi-Source Login scenario complete.', 'success');
+            button.disabled = false;
+            button.innerText = originalText;
+        }
+
+    </script>
+
+</body>
+</html>
+
