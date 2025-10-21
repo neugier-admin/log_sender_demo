@@ -57,9 +57,9 @@
 
   <rule id="100204" level="10" frequency="5" timeframe="60">
     <if_matched_sid>100203</if_matched_sid>
-    <same_field>h3c.hostname</same_field>
     <same_field>h3c.user</same_field>
-    <description>H3C: Brute-Force Attack detected. 5 failures for user $(h3c.user) on host $(h3c.hostname) within 1 minute.</description>
+    <same_field>h3c.srcip</same_field>
+    <description>H3C: Brute-Force Attack detected. 5 failures for user $(h3c.user) from the same source IP $(h3c.srcip) within 1 minute.</description>
     <mitre>
       <id>T1110.001</id>
     </mitre>
@@ -69,7 +69,8 @@
   <rule id="100205" level="10" frequency="5" timeframe="60">
     <if_matched_sid>100203</if_matched_sid>
     <same_field>h3c.srcip</same_field>
-    <description>H3C: Horizontal Brute-Force Attack suspected. 5 failures from same source IP $(h3c.srcip) within 1 minute (targeting multiple users).</description>
+    <different_field>h3c.user</different_field>
+    <description>H3C: Horizontal Brute-Force Attack suspected. 5 failures from same source IP $(h3c.srcip) within 1 minute (targeting different users).</description>
     <mitre>
       <id>T1110.001</id>
     </mitre>
@@ -79,7 +80,8 @@
   <rule id="100206" level="10" frequency="5" timeframe="60">
     <if_matched_sid>100203</if_matched_sid>
     <same_field>h3c.user</same_field>
-    <description>H3C: Password Guessing Attack suspected. 5 failures for the same user $(h3c.user) within 1 minute (from multiple sources).</description>
+    <different_field>h3c.srcip</different_field>
+    <description>H3C: Password Guessing Attack suspected. 5 failures for the same user $(h3c.user) within 1 minute (from different sources).</description>
     <mitre>
       <id>T1110.001</id>
     </mitre>
