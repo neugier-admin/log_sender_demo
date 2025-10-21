@@ -7,6 +7,9 @@
   <prematch type="pcre2">SSHS_AUTH_SUCCESS: SSH user </prematch>
   <regex type="pcre2">^(.+?)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_AUTH_SUCCESS):\s+(SSH user (\S+) from (\S+) port (\d+) passed password authentication\.*)$</regex>
   <order>h3c.hostname, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip, h3c.srcport</order>
+  <field name="user">h3c.user</field>
+  <field name="srcip">h3c.srcip</field>
+  <field name="srcport">h3c.srcport</field>
 </decoder>
 
 <decoder name="h3c-sshs-connect">
@@ -14,6 +17,8 @@
   <prematch type="pcre2">SSHS_CONNECT: SSH user </prematch>
   <regex type="pcre2">^(.+?)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_CONNECT):\s+(SSH user (\S+) \(IP: (\S+)\) connected to the server successfully\.*)$</regex>
   <order>h3c.hostname, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip</order>
+  <field name="user">h3c.user</field>
+  <field name="srcip">h3c.srcip</field>
 </decoder>
 
 <decoder name="h3c-shell-login">
@@ -21,6 +26,8 @@
   <prematch type="pcre2">SHELL_LOGIN: \S+ logged in from </prematch>
   <regex type="pcre2">^(.+?)\s+%(\d+)(\S+)\/(\d+)\/(SHELL_LOGIN):\s+((\S+) logged in from (\S+)\.*)$</regex>
   <order>h3c.hostname, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip</order>
+  <field name="user">h3c.user</field>
+  <field name="srcip">h3c.srcip</field>
 </decoder>
 
 <decoder name="h3c-sshs-auth-fail">
@@ -28,8 +35,11 @@
   <prematch type="pcre2">SSHS_AUTH_PWD_FAIL: Authentication failed for user </prematch>
   <regex type="pcre2">^(.+?)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_AUTH_PWD_FAIL):\s+(Authentication failed for user (\S+) from (\S+) port (\d+) because of .*)$</regex>
   <order>h3c.hostname, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip, h3c.srcport</order>
+  <field name="user">h3c.user</field>
+  <field name="srcip">h3c.srcip</field>
+  <field name="srcport">h3c.srcport</field>
 </decoder>
-                                                                                                    
+
 <group name="h3c,">
 
   <rule id="100201" level="0">
