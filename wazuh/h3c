@@ -1,0 +1,89 @@
+<decoder name="h3c-realhostname-parent">
+  <prematch type="pcre2">^\S+\s+syslog\s+test\s+\S+\s+%</prematch>
+</decoder>
+
+<decoder name="h3c-sshs-auth-success">
+  <parent>h3c-realhostname-parent</parent>
+  <prematch type="pcre2">SSHS_AUTH_SUCCESS: SSH user </prematch>
+  <regex type="pcre2">^(\S+)\s+syslog\s+test\s+(\S+)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_AUTH_SUCCESS):\s+(SSH user (\S+) from (\S+) port (\d+) passed password authentication\.*)$</regex>
+  <order>h3c.hostname, h3c.device, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip, h3c.srcport</order>
+</decoder>
+
+<decoder name="h3c-sshs-connect">
+  <parent>h3c-realhostname-parent</parent>
+  <prematch type="pcre2">SSHS_CONNECT: SSH user </prematch>
+  <regex type="pcre2">^(\S+)\s+syslog\s+test\s+(\S+)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_CONNECT):\s+(SSH user (\S+) \(IP: (\S+)\) connected to the server successfully\.*)$</regex>
+  <order>h3c.hostname, h3c.device, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip</order>
+</decoder>
+
+<decoder name="h3c-shell-login">
+  <parent>h3c-realhostname-parent</parent>
+  <prematch type="pcre2">SHELL_LOGIN: \S+ logged in from </prematch>
+  <regex type="pcre2">^(\S+)\s+syslog\s+test\s+(\S+)\s+%(\d+)(\S+)\/(\d+)\/(SHELL_LOGIN):\s+((\S+) logged in from (\S+)\.*)$</regex>
+  <order>h3c.hostname, h3c.device, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip</order>
+</decoder>
+
+<decoder name="h3c-sshs-auth-fail">
+  <parent>h3c-realhostname-parent</parent>
+  <prematch type="pcre2">SSHS_AUTH_PWD_FAIL: Authentication failed for user </prematch>
+  <regex type="pcre2">^(\S+)\s+syslog\s+test\s+(\S+)\s+%(\d+)(\S+)\/(\d+)\/(SSHS_AUTH_PWD_FAIL):\s+(Authentication failed for user (\S+) from (\S+) port (\d+) because of .*)$</regex>
+  <order>h3c.hostname, h3c.device, h3c.logid_prefix, h3c.module, h3c.severity, h3c.status, data, h3c.user, h3c.srcip, h3c.srcport</order>
+</decoder>
+                                                                                                    
+<group name="h3c,">
+
+  <rule id="100201" level="0">
+    <field name="h3c.hostname" type="pcre2">.+</field>
+    <description>H3C: Grouping rule for H3C device events.</description>
+    <group>h3c_events,custom_h3c,</group>
+  </rule>
+
+  <rule id="100202" level="3">
+    <if_sid>100201</if_sid>
+    <field name="h3c.status" type="pcre2">^SHELL_LOGIN$</field>
+    <description>H3C: User successfully logged in (Real Host: $(h3c.hostname), User: $(h3c.user), IP: $(h3c.srcip)).</description>
+    <group>h3c_login,authentication_success,custom_h3c,</group>
+  </rule>
+
+  <rule id="100203" level="5">
+    <if_sid>100201</if_sid>
+    <field name="h3c.status" type="pcre2">^SSHS_AUTH_PWD_FAIL$</field>
+    <description>H3C: Authentication failure (Real Host: $(h3c.hostname), User: $(h3c.user), IP: $(h3c.srcip)).</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>h3c_login,authentication_failed,custom_h3c,</group>
+  </rule>
+
+  <rule id="100204" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100203</if_matched_sid>
+    <same_field>h3c.hostname</same_field>
+    <same_field>h3c.user</same_field>
+    <description>H3C: Brute-Force Attack detected. 5 failures for user $(h3c.user) on host $(h3c.hostname) within 1 minute.</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>h3c_login,authentication_failed,brute_force,custom_h3c,</group>
+  </rule>
+  
+  <rule id="100205" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100203</if_matched_sid>
+    <same_field>h3c.srcip</same_field>
+    <description>H3C: Horizontal Brute-Force Attack suspected. 5 failures from same source IP $(h3c.srcip) within 1 minute (targeting multiple users).</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>h3c_login,authentication_failed,brute_force,custom_h3c,</group>
+  </rule>
+
+  <rule id="100206" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100203</if_matched_sid>
+    <same_field>h3c.user</same_field>
+    <description>H3C: Password Guessing Attack suspected. 5 failures for the same user $(h3c.user) within 1 minute (from multiple sources).</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>h3c_login,authentication_failed,brute_force,custom_h3c,</group>
+  </rule>
+
+</group>
