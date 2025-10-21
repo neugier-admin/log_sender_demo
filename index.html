@@ -112,7 +112,7 @@
         .space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
         .space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
         .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
-        .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
@@ -273,78 +273,88 @@
                 </div>
                 <!-- Alert Scenarios Content -->
                 <div id="content-scenarios" class="hidden">
-                    <div class="space-y-6">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-300 mb-3">Juniper Scenarios</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
-                                    <div class="flex-grow">
-                                        <p class="font-bold text-purple-400">Brute Force Attack</p>
-                                        <p class="text-sm text-gray-400 mt-1">Sends 3 failed Juniper login logs in quick succession.</p>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button onclick="sendJuniperBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
-                                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Left Column: Juniper -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-center text-gray-300">Juniper Scenarios</h3>
+                            <!-- Brute Force Card -->
+                            <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                <div class="flex-grow">
+                                    <p class="font-bold text-purple-400">Brute Force Attack</p>
+                                    <p class="text-sm text-gray-400 mt-1">Sends 3 failed Juniper login logs in quick succession.</p>
                                 </div>
-                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
-                                    <div class="flex-grow">
-                                        <p class="font-bold text-purple-400">Multi-Source Logins</p>
-                                        <p class="text-sm text-gray-400 mt-1">Sends Juniper login logs from 3 different source IPs.</p>
-                                        <div class="space-y-2 mt-3">
-                                            <div>
-                                                <label for="juniper-ip-1" class="text-xs text-gray-400">Source IP 1</label>
-                                                <input type="text" id="juniper-ip-1" value="10.255.1.76" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
-                                            <div>
-                                                <label for="juniper-ip-2" class="text-xs text-gray-400">Source IP 2</label>
-                                                <input type="text" id="juniper-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
-                                            <div>
-                                                <label for="juniper-ip-3" class="text-xs text-gray-400">Source IP 3</label>
-                                                <input type="text" id="juniper-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
+                                <div class="mt-3">
+                                    <button onclick="sendJuniperBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                </div>
+                            </div>
+                            <!-- Multi-Source Card -->
+                            <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                <div class="flex-grow">
+                                    <p class="font-bold text-purple-400">Multi-Source Logins</p>
+                                    <p class="text-sm text-gray-400 mt-1">Simulates logins for one user from 3 different source IPs.</p>
+                                    <div class="space-y-2 mt-3">
+                                        <div>
+                                            <label for="juniper-ms-user" class="text-xs text-gray-400">Username</label>
+                                            <input type="text" id="juniper-ms-user" value="admin" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="juniper-ip-1" class="text-xs text-gray-400">Source IP 1</label>
+                                            <input type="text" id="juniper-ip-1" value="10.255.1.76" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="juniper-ip-2" class="text-xs text-gray-400">Source IP 2</label>
+                                            <input type="text" id="juniper-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="juniper-ip-3" class="text-xs text-gray-400">Source IP 3</label>
+                                            <input type="text" id="juniper-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
                                         </div>
                                     </div>
-                                    <div class="mt-3">
-                                        <button onclick="sendJuniperMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
-                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button onclick="sendJuniperMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
                                 </div>
                             </div>
                         </div>
-                        <div>
-                           <h3 class="text-lg font-semibold text-gray-300 mb-3">H3C Scenarios</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
-                                    <div class="flex-grow">
-                                        <p class="font-bold text-purple-400">Brute Force Attack</p>
-                                        <p class="text-sm text-gray-400 mt-1">Sends 3 failed H3C login logs in quick succession.</p>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button onclick="sendH3cBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
-                                    </div>
+                        <!-- Right Column: H3C -->
+                        <div class="space-y-4">
+                           <h3 class="text-lg font-semibold text-center text-gray-300">H3C Scenarios</h3>
+                            <!-- Brute Force Card -->
+                            <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                <div class="flex-grow">
+                                    <p class="font-bold text-purple-400">Brute Force Attack</p>
+                                    <p class="text-sm text-gray-400 mt-1">Sends 3 failed H3C login logs in quick succession.</p>
                                 </div>
-                                <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
-                                    <div class="flex-grow">
-                                        <p class="font-bold text-purple-400">Multi-Source Logins</p>
-                                        <p class="text-sm text-gray-400 mt-1">Sends H3C login logs from 3 different source IPs.</p>
-                                         <div class="space-y-2 mt-3">
-                                            <div>
-                                                <label for="h3c-ip-1" class="text-xs text-gray-400">Source IP 1</label>
-                                                <input type="text" id="h3c-ip-1" value="10.255.1.70" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
-                                            <div>
-                                                <label for="h3c-ip-2" class="text-xs text-gray-400">Source IP 2</label>
-                                                <input type="text" id="h3c-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
-                                            <div>
-                                                <label for="h3c-ip-3" class="text-xs text-gray-400">Source IP 3</label>
-                                                <input type="text" id="h3c-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
-                                            </div>
+                                <div class="mt-3">
+                                    <button onclick="sendH3cBruteForce(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
+                                </div>
+                            </div>
+                            <!-- Multi-Source Card -->
+                            <div class="log-card p-3 bg-gray-700 rounded-lg border border-gray-600">
+                                <div class="flex-grow">
+                                    <p class="font-bold text-purple-400">Multi-Source Logins</p>
+                                    <p class="text-sm text-gray-400 mt-1">Simulates logins for one user from 3 different source IPs.</p>
+                                     <div class="space-y-2 mt-3">
+                                        <div>
+                                            <label for="h3c-ms-user" class="text-xs text-gray-400">Username</label>
+                                            <input type="text" id="h3c-ms-user" value="ccnetwork" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="h3c-ip-1" class="text-xs text-gray-400">Source IP 1</label>
+                                            <input type="text" id="h3c-ip-1" value="10.255.1.70" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="h3c-ip-2" class="text-xs text-gray-400">Source IP 2</label>
+                                            <input type="text" id="h3c-ip-2" value="192.168.10.25" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
+                                        </div>
+                                        <div>
+                                            <label for="h3c-ip-3" class="text-xs text-gray-400">Source IP 3</label>
+                                            <input type="text" id="h3c-ip-3" value="10.255.1.88" class="w-full bg-gray-800 border border-gray-600 rounded-md px-2 py-1 text-sm text-gray-200">
                                         </div>
                                     </div>
-                                    <div class="mt-3">
-                                        <button onclick="sendH3cMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
-                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button onclick="sendH3cMultiSource(this)" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-3 rounded transition">Run Scenario</button>
                                 </div>
                             </div>
                         </div>
@@ -490,23 +500,25 @@
         }
         function sendJuniperMultiSource(btn) {
             logToConsole('Starting Juniper Multi-Source Login scenario...', 'sending');
+            const username = document.getElementById('juniper-ms-user').value;
             const ips = [document.getElementById('juniper-ip-1').value, document.getElementById('juniper-ip-2').value, document.getElementById('juniper-ip-3').value];
-            if (ips.some(ip => !ip)) { logToConsole('All three source IPs must be provided!', 'error'); return; }
+            if (ips.some(ip => !ip) || !username) { logToConsole('Username and all three source IPs must be provided!', 'error'); return; }
             const templates = [
-                `Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_LOGIN_EVENT: User 'root' login from host '${ips[0]}', class 'super-user'`,
-                `Oct 17 15:24:05 Juniper-QA-SW mgd[17491]: UI_LOGIN_EVENT: User 'admin' login from host '${ips[1]}', class 'super-user'`,
-                `Oct 17 15:24:12 Juniper-QA-SW mgd[17498]: UI_LOGIN_EVENT: User 'netops' login from host '${ips[2]}', class 'operator'`
+                `Oct 17 15:23:57 Juniper-QA-SW mgd[17484]: UI_LOGIN_EVENT: User '${username}' login from host '${ips[0]}', class 'super-user'`,
+                `Oct 17 15:24:05 Juniper-QA-SW mgd[17491]: UI_LOGIN_EVENT: User '${username}' login from host '${ips[1]}', class 'super-user'`,
+                `Oct 17 15:24:12 Juniper-QA-SW mgd[17498]: UI_LOGIN_EVENT: User '${username}' login from host '${ips[2]}', class 'super-user'`
             ];
             runScenario(btn, templates).then(() => logToConsole('Juniper Multi-Source Login scenario complete.', 'success'));
         }
         function sendH3cMultiSource(btn) {
             logToConsole('Starting H3C Multi-Source Login scenario...', 'sending');
+            const username = document.getElementById('h3c-ms-user').value;
             const ips = [document.getElementById('h3c-ip-1').value, document.getElementById('h3c-ip-2').value, document.getElementById('h3c-ip-3').value];
-            if (ips.some(ip => !ip)) { logToConsole('All three source IPs must be provided!', 'error'); return; }
+            if (ips.some(ip => !ip) || !username) { logToConsole('Username and all three source IPs must be provided!', 'error'); return; }
             const templates = [
-                `Oct 17 15:37:59 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ccnetwork logged in from ${ips[0]}.`,
-                `Oct 17 15:38:05 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: anotheruser logged in from ${ips[1]}.`,
-                `Oct 17 15:38:12 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: admin logged in from ${ips[2]}.`
+                `Oct 17 15:37:59 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ${username} logged in from ${ips[0]}.`,
+                `Oct 17 15:38:05 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ${username} logged in from ${ips[1]}.`,
+                `Oct 17 15:38:12 2025 H3C syslog test SW %10SHELL/5/SHELL_LOGIN: ${username} logged in from ${ips[2]}.`
             ];
             runScenario(btn, templates).then(() => logToConsole('H3C Multi-Source Login scenario complete.', 'success'));
         }
