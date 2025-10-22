@@ -1,0 +1,33 @@
+<decoder name="juniper-mgd">
+  <program_name>mgd</program_name>
+  <regex type="pcre2">^\[(\d+)\]:\s+(.*)$</regex>
+  <order>pid, message</order>
+</decoder>
+
+<decoder name="juniper-ui-login">
+  <parent>juniper-mgd</parent>
+  <prematch type="pcre2">^UI_LOGIN_EVENT:</prematch>
+  <regex type="pcre2">^(UI_LOGIN_EVENT):\s+User '([^']*)' login, class '([^']*)' [^,]+, ssh-connection '[^']*', client-mode '([^']*)'</regex>
+  <order>juniper.event, juniper.user, juniper.user_class, juniper.client_mode</order>
+</decoder>
+
+<decoder name="juniper-ui-auth">
+  <parent>juniper-mgd</parent>
+  <prematch type="pcre2">^UI_AUTH_EVENT:</prematch>
+  <regex type="pcre2">^(UI_AUTH_EVENT):\s+Authenticated user '([^']*)' at permission level '([^']*)'</regex>
+  <order>juniper.event, juniper.user, juniper.permission_level</order>
+</decoder>
+
+<decoder name="juniper-config-mode">
+  <parent>juniper-mgd</parent>
+  <prematch type="pcre2">^UI_DBBASE_LOGIN_EVENT:</prematch>
+  <regex type="pcre2">^(UI_DBBASE_LOGIN_EVENT):\s+User '([^']*)' (.*)</regex>
+  <order>juniper.event, juniper.user, juniper.action</order>
+</decoder>
+
+<decoder name="juniper-sshd-login-fail">
+  <parent>sshd</parent>
+  <prematch type="pcre2">^SSHD_LOGIN_FAILED:</prematch>
+  <regex type="pcre2">^(SSHD_LOGIN_FAILED):\s+Login failed for user '([^']*)' from host '(\S+)'</regex>
+  <order>juniper.event, juniper.user, juniper.srcip</order>
+</decoder>
