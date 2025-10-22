@@ -1,0 +1,69 @@
+<group name="juniper,syslog,">
+
+  <rule id="100101" level="0">
+    <field name="juniper.event" type="pcre2">.+</field>
+    <description>Juniper: Base rule for custom decoded events.</description>
+  </rule>
+
+  <rule id="100102" level="5">
+    <if_sid>100101</if_sid>
+    <field name="juniper.event" type="pcre2">^SSHD_LOGIN_FAILED$</field>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_AC.7,tsc_CC6.1,tsc_CC6.8,</group>
+    <description>Juniper: SSH login failed for user $(juniper.user) from $(juniper.srcip).</description>
+  </rule>
+
+  <rule id="100103" level="3">
+    <if_sid>100101</if_sid>
+    <field name="juniper.event" type="pcre2">^UI_LOGIN_EVENT$</field>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <group>authentication_success,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_AC.7,tsc_CC6.8,</group>
+    <description>Juniper: User $(juniper.user) logged in (Class: $(juniper.user_class), Mode: $(juniper.client_mode)).</description>
+  </rule>
+
+  <rule id="100104" level="4">
+    <if_sid>100101</if_sid>
+    <field name="juniper.event" type="pcre2">^UI_DBBASE_LOGIN_EVENT$</field>
+    <group>configuration_changed,pci_dss_10.2.7,pci_dss_1.1.2,gpg13_4.14,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_CM.5,tsc_CC8.1,tsc_CC6.1,</group>
+    <description>Juniper: User $(juniper.user) is entering configuration mode.</description>
+  </rule>
+
+
+  <rule id="100105" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100102</if_matched_sid>
+    <same_field>juniper.srcip</same_field>
+    <same_field>juniper.user</same_field>
+    <group>authentication_failures,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_AC.7,tsc_CC6.1,tsc_CC6.8,</group>
+    <description>Juniper: [Brute Force] 5 login failures for user $(juniper.user) from IP $(juniper.srcip) in 1 min.</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100106" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100102</if_matched_sid>
+    <same_field>juniper.srcip</same_field>
+    <different_field>juniper.user</different_field>
+    <group>authentication_failures,recon,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_AC.7,tsc_CC6.1,tsc_CC6.8,</group>
+    <description>Juniper: [Account Discovery] 5 login failures for different users from IP $(juniper.srcip) in 1 min.</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100107" level="10" frequency="5" timeframe="60">
+    <if_matched_sid>100102</if_matched_sid>
+    <same_field>juniper.user</same_field>
+    <different_field>juniper.srcip</different_field>
+    <group>authentication_failures,recon,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,hipaa_164.312.b,nist_800_53_AU.14,nist_800_53_AC.7,tsc_CC6.1,tsc_CC6.8,</group>
+    <description>Juniper: [Distributed Attack] User $(juniper.user) login failed from 5 different IPs in 1 min.</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+  </rule>
+
+</group>
